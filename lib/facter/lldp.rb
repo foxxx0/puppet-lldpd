@@ -23,13 +23,7 @@ Facter.add(:lldp) do
       if json.instance_of?(Hash)
         fact_data['interfaces'] = json
       else
-        json.each do |iface_h|
-          ifaces = iface_h.keys
-          raise MalformedDataError, 'expected exactly one key per interface object' unless ifaces.size == 1
-
-          iface = ifaces.first
-          fact_data['interfaces'][iface] = iface_h[iface]
-        end
+        fact_data['interfaces'] = json.map { |i| n = i.keys.first; [n, i[n]] }.to_h
       end
     rescue MalformedDataError => e
       Facter.warn("invalid or malformed lldp data: #{e.class}: #{e}")
